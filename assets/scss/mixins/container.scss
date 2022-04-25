@@ -1,0 +1,23 @@
+@mixin container {
+  width: 100%;
+  max-width: 1290px;
+  @include _1400 {
+    max-width: 1286px;
+  }
+  @include _1300 {
+    max-width: 1186px;
+  }
+  @include _1199 {
+    max-width: 850px;
+  }
+  @include _991 {
+    max-width: 720px;
+  }
+  @include _767 {
+    max-width: 540px;
+  }
+  @include _575 {
+    max-width: 100vw;
+    padding: 0 20px;
+  }
+}

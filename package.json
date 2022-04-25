@@ -1,0 +1,29 @@
+{
+  "name": "test-web3",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate"
+  },
+  "dependencies": {
+    "@cryptonteam/web4": "^0.1.9",
+    "bignumber.js": "^9.0.2",
+    "core-js": "^3.19.3",
+    "nuxt": "^2.15.8",
+    "sass": "^1.50.1",
+    "vue": "^2.6.14",
+    "vue-server-renderer": "^2.6.14",
+    "vue-template-compiler": "^2.6.14",
+    "web3": "^1.7.3",
+    "webpack": "^4.46.0"
+  },
+  "devDependencies": {
+    "@nuxt/types": "^2.15.8",
+    "@nuxt/typescript-build": "^2.1.0",
+    "@nuxtjs/dotenv": "^1.4.1",
+    "@nuxtjs/style-resources": "^1.2.1"
+  }
+}
