@@ -1,5 +1,5 @@
 import { ActionTree } from 'vuex'
-import { IWeb3State } from '~/store/web3store/state'
+import { IWeb3State } from '~/store/web3/state'
 import { connectNode, connectWallet } from '~/utils/web3'
 
 const actions: ActionTree<IWeb3State, IWeb3State> = {

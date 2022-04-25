@@ -1,8 +1,8 @@
 import { GetterTree } from 'vuex'
-import { IWeb3State } from '~/store/web3store/state'
+import { IWeb3State } from '~/store/web3/state'
 
 export interface IWeb3Getter {
-  getIsConnected: boolean
+  getIsConnected: boolean;
 }
 
 

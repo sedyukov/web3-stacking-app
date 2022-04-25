@@ -1,116 +1,79 @@
 <template>
-  <div class="token-form">
-    <div class="token-form__el">
-      <label for="mintAmount">MINT:</label>
-      <input :disabled="!isConnected" id="mintAmount" v-model="mintAmount" type="text" placeholder="mintAmount">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="mint">
-        MINT
-      </button>
+  <div class="contract-form">
+    <div class="contract-form__el">
+    <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="refresh">
+      {{ $t(`buttons.refresh`) }}
+    </button>
+    <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="openModal">
+      {{ $t(`buttons.claim`).toUpperCase() }}
+    </button>
     </div>
-    <div class="token-form__el">
-      <label for="stakeAmount">STAKE:</label>
-      <input :disabled="!isConnected" id="stakeAmount" v-model="stakeAmount" type="text" placeholder="stakeAmount">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="actionBtnStake">
-        {{ btnStakeText.toUpperCase() }}
-      </button>
-    </div>
-    <div class="token-form__el">
-      <label for="unstakeAmount">UNSTAKE:</label>
-      <input :disabled="!isConnected" id="unstakeAmount" v-model="unstakeAmount" type="text" placeholder="unstakeAmount">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="unstake">
-        UNSTAKE
-      </button>
-    </div>
+    <ModalFee v-if="isModal" :fee="fee" @confirm="claim" @decline="decline"/>
   </div>
 </template>
 
 <script>
 import {mapGetters} from "vuex";
+import { getFee } from '~/utils/web3'
 import BigNumber from "bignumber.js";
+import {STACKING_CONTRACT} from "~/utils/abis/stackingContract";
+import {shiftedBy} from "~/utils";
 
 export default {
-  name: "TokenForm",
+  name: "ContractForm",
   data() {
     return {
-      mintAmount: '0',
-      stakeAmount: '0',
-      unstakeAmount: '0',
-      btnStakeText: 'stake',
-      isStacking: false,
       isUpdated: true,
+      isModal: false,
+      currentAction: '',
+      fee: ''
     }
   },
   computed: {
     ...mapGetters({
-      allowance: 'token/getAllowance',
       isConnected: 'wallet/getIsConnected',
+      address: 'contract/getContractAddress'
     }),
   },
-  mounted() {
-  },
   methods: {
-    mint() {
-      this.$store.dispatch('token/mintStaking', this.mintAmount);
-      this.mintAmount = '0';
+    refresh() {
+      this.$store.dispatch('contract/getClaimableAmount', this.mintAmount);
     },
-    actionBtnStake() {
-      // if (!this.isUpdated) {
-      //   this.update();
-      // }
-      if (this.isStacking) {
-        this.stake();
-      } else {
-        this.approve();
-      }
+    claim() {
+      this.isModal = false;
+      this.startLoading();
+      this.$store.dispatch('contract/claim').then(() => this.update());
     },
-    stake() {
-      this.$store.dispatch('contract/stake', this.stakeAmount);
-      this.stakeAmount = '0';
+    async openModal() {
+      const fee = await getFee('claim', STACKING_CONTRACT, this.address)
+      this.fee = shiftedBy(fee, '18');
+      console.log(this.fee);
+      this.isModal = true;
     },
-    approve() {
-      this.$store.dispatch('token/approve', this.stakeAmount);
-      this.stakeAmount = '0';
-    },
-    unstake() {
-      this.$store.dispatch('token/stake', this.unstakeAmount);
-      this.unstakeAmount = '0';
+    decline() {
+      this.isModal = false;
     },
     async update() {
       await Promise.all([
         this.$store.dispatch('token/fetchUserDataToken'),
-        this.$store.dispatch('token/getAllowance')
+        this.$store.dispatch('contract/getClaimableAmount'),
+        this.$store.dispatch('contract/pastEvents'),
       ])
-      this.timer();
+      this.$store.commit('wallet/SET_IS_UPDATING', false);
     },
-    timer() {
-      this.isUpdated = true;
-      setTimeout(() => {
-        console.log('expired');
-        this.isUpdated = false;
-      }, 10000)
+    startLoading() {
+      this.$store.commit('wallet/SET_IS_UPDATING', true);
     }
   },
-  watch: {
-    stakeAmount(val) {
-      console.log(this.allowance[0]);
-      const value = new BigNumber(val);
-      const allowance = new BigNumber(this.allowance[0]);
-      this.isStacking = !(value.comparedTo(allowance) === 1);
-      this.btnStakeText =  this.isStacking ? 'stake' : 'approve';
-    },
-
-  }
 }
 </script>
 
 <style scoped lang="scss">
-.token-form {
+.contract-form {
   margin-top: 30px;
   &__el {
-    margin-bottom: 15px;
-    input {
-      display: block;
-      margin-bottom: 3px;
+    button {
+      margin-bottom: 15px;
     }
   }
 }

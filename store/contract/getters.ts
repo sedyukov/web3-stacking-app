@@ -1,18 +1,20 @@
 import { GetterTree } from 'vuex'
-import { ITokensMap, ITokenState } from '~/store/token/state'
+import { ITokenState } from '~/store/contract/state'
 
 export interface ITokenGetter {
-  getTokensMap: ITokensMap;
-  getTokensKeys: string[];
-  getDecimalsByAddress: (address: string) => string;
-  getTokens: string[];
+  getStakerData: string;
+  getClaimableAmount: string;
+  getContractAddress: string;
+  getEvents: any;
+  getIsModal: boolean;
 }
 
 const getters: GetterTree<ITokenState, ITokenState> = {
-  getTokensMap: (state): ITokensMap => state.tokensMap,
-  getTokensKeys: (state): Array<string> => Object.keys(state.tokensMap),
-  getDecimalsByAddress: state => (address: string): string => (state.tokensMap[address].decimals || ''),
-  getTokens: (state): string[] => state.tokenAddresses
+  getStakerData: (state):  string => state.stakerData,
+  getContractAddress: (state):  string => state.contractAddress,
+  getClaimableAmount: (state):  string => state.claimableAmount,
+  getEvents: (state): any[] => state.events,
+  getIsModal: (state): boolean => state.isModal,
 }
 
 export default getters

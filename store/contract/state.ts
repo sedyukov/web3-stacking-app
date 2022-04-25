@@ -1,17 +1,17 @@
-import Token from '~/classes/Token'
-
-export interface ITokensMap {
-  [key: string]: Token;
-}
-
 export interface ITokenState {
-  tokensMap: ITokensMap,
-  tokenAddresses: string[]
+  stakerData: string,
+  claimableAmount: string,
+  contractAddress: string,
+  events: any[],
+  isModal: boolean,
 }
 
-export const initState = (): { tokenAddresses: string[]; tokensMap: {} } => ({
-  tokensMap: {},
-  tokenAddresses: []
+export const initState = (): { stakerData: string, claimableAmount: string, contractAddress: string, events: any[], isModal: boolean} => ({
+  stakerData: '',
+  claimableAmount: '',
+  contractAddress: process.env.stackingContract || '',
+  events: [],
+  isModal: false,
 })
 
 export default initState

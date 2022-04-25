@@ -36,7 +36,30 @@ export default {
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    '@nuxtjs/i18n',
   ],
+  i18n: {
+    locales: [
+      {
+        code: 'en',
+        file: 'en.js',
+      },
+      {
+        code: 'ru',
+        file: 'ru.js',
+      },
+    ],
+    strategy: 'no_prefix',
+    lazy: true,
+    langDir: 'lang/',
+    defaultLocale: 'en',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      alwaysRedirect: true,
+      onlyOnRoot: true,
+    },
+  },
   css: [
     '@/assets/scss/main.scss'
   ],
@@ -58,6 +81,8 @@ export default {
     name: 'circle',
     color: '#3B8070',
     background: 'white'
+  },
+  loading: {
+    continuous: true
   }
-
 }

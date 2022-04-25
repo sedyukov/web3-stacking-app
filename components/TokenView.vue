@@ -1,47 +1,74 @@
 <template>
   <div class="stacking-token">
-    <div class="stacking-token__title">STACKING TOKEN:</div>
-    <div class="stacking-token__el">symbol: {{ stagingToken.symbol }}</div>
-    <div class="stacking-token__el">decimals: {{ stagingToken.decimals }}</div>
-    <div class="stacking-token__el">balance: {{ stagingToken.balance }}</div>
-    <div class="stacking-token__el">allowance: 1000</div>
+    <div class="stacking-token__title">{{ tokenType.toUpperCase() }} {{ $t(`main.token`).toUpperCase() }}:</div>
+    <div class="stacking-token__el">{{ $t(`main.symbol`) }}: {{ stagingToken.symbol }}</div>
+    <div class="stacking-token__el">{{ $t(`main.decimals`) }}: {{ stagingToken.decimals }}</div>
+    <div class="stacking-token__el">{{ $t(`main.balance`) }}: {{ stagingToken.balance }}</div>
+    <div class="stacking-token__el">{{ $t(`main.allowance`) }}: {{ allowance }}</div>
   </div>
 </template>
 
-<script lang="ts">
-import Web3 from 'web3'
+<script>
 import Vue from 'vue'
 import {mapGetters} from "vuex";
+import { getEthereum } from "~/utils/web3";
 export default Vue.extend({
-  name: 'StackingToken',
+  name: 'TokenView',
+  props: {
+    tokenType: {
+      type: String,
+      required: true,
+    },
+  },
   data () {
     return {
     }
   },
-  mounted() {
+  async mounted() {
   },
   computed: {
     ...mapGetters({
       tokensMap: 'token/getTokensMap',
-      tokensKeys: 'token/getTokensKeys',
       tokens: 'token/getTokens',
-      stakerData: 'contract/getStakerData',
+      isConnected: 'wallet/getIsConnected',
+      allowances: 'token/getAllowance',
     }),
-    stagingToken: function() {
-      console.log(this.tokensMap[this.tokens[0]]);
-      return this.tokensMap[this.tokens[0]];
+    stagingToken() {
+      const type = this.tokenType === 'stacking' ? 0 : 1;
+      return this.tokensMap[this.tokens[type]];
+    },
+    allowance() {
+      const type = this.tokenType === 'stacking' ? 0 : 1;
+      return this.allowances[type];
     },
   },
+  watch: {
+    isConnected(val) {
+      if (val) {
+        this.$store.dispatch('token/getAllowance');
+      }
+    },
+    messages() {
+      console.log('CHANGED');
+    }
+  },
   methods: {
+    async getMessages() {
+      const r = await getEthereum();
+      r.on('message', () => {
+      })
+    },
   }
 })
 </script>
 
-<style scoped>
-.stacking-token__title {
-  margin-bottom: 5px;
-}
-.stacking-token__el {
-  padding: 5px;
+<style scoped lang="scss">
+.stacking-token {
+  &__title {
+    margin-bottom: 5px;
+  }
+  &__el {
+    padding: 5px;
+  }
 }
 </style>

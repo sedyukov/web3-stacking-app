@@ -1,27 +1,32 @@
 <template>
-  <div class="container">
-    <Loader v-show="loading"/>
-    <div class="wallet">
-      <button
-        class="default-button"
-        @click="connectWallet"
-      >
-        wallet
-      </button>
-    </div>
-    <div class="loading" v-if="loading">loading...</div>
-    <div class="content" v-else>
-      <div class="content__right-row">
-        <TokenView token-type="stacking"/>
-        <TokenForm/>
+    <div class="container">
+      <div class="wallet">
+        <button
+          class="default-button"
+          @click="connectWallet"
+        >
+          {{ $t(`main.wallet`) }}
+        </button>
       </div>
-      <div class="content__left-row">
-        <TokenView token-type="reward"/>
-        <StackingInfo />
-        <ContractForm />
+      <Loader v-if="isUpdating"/>
+      <div v-if="!firstLoading">
+        <div class="content">
+          <div class="content__right-row">
+            <TokenView token-type="stacking"/>
+            <TokenForm/>
+          </div>
+          <div class="content__left-row">
+            <TokenView token-type="reward"/>
+            <StackingInfo />
+            <ContractForm />
+          </div>
+        </div>
+        <div class="content scroll-area">
+          <EventsTable/>
+        </div>
       </div>
+      <LocaleChanger />
     </div>
-  </div>
 </template>
 
 <script lang="ts">
@@ -30,7 +35,10 @@ import TokenView from "~/components/TokenView.vue";
 import TokenForm from "~/components/TokenForm.vue";
 import StackingInfo from "~/components/StackingInfo.vue";
 import ContractForm from "~/components/ContractForm.vue";
+import LocaleChanger from "~/components/LocaleChanger.vue"
+import EventsTable from "~/components/EventsTable.vue"
 import Loader from "~/components/Loader.vue"
+import ModalFee from "~/components/ModalFee.vue"
 import { mapActions, mapGetters } from 'vuex'
 export default Vue.extend({
   name: 'IndexPage',
@@ -39,21 +47,27 @@ export default Vue.extend({
     StackingInfo,
     Loader,
     TokenForm,
-    ContractForm
+    ContractForm,
+    LocaleChanger,
+    EventsTable,
+    ModalFee
   },
   data() {
     return {
-      loading: true,
+      firstLoading: true,
     }
   },
   async mounted () {
     await this.connectNode()
-    this.loading = false;
+    this.$store.commit('wallet/SET_IS_UPDATING', false);
+    this.firstLoading = false;
   },
   computed: {
     ...mapGetters({
       tokensMap: 'token/getTokensMap',
       tokensKeys: 'token/getTokensKeys',
+      isUpdating: 'wallet/getIsUpdating',
+      isModal: 'contract/getIsModal'
     })
   },
   methods: {
@@ -70,7 +84,14 @@ export default Vue.extend({
 .content {
   display: flex;
   justify-content: space-evenly;
-  margin-top: 200px;
+  margin-top: 100px;
+}
+.scroll-area {
+  max-height: 400px;
+  height: 35%;
+  overflow-y: scroll;
+  border: 1px solid black;
+  margin: 100px 200px 100px 200px;
 }
 .default-button {
   background: black;

@@ -1,27 +1,18 @@
 import { MutationTree } from 'vuex'
-import { ITokensMap, ITokenState } from '~/store/token/state'
+import { ITokenState } from '~/store/contract/state'
 
 const mutations: MutationTree<ITokenState> = {
-  SET_TOKENS_MAP: (state, payload: ITokensMap) => (state.tokensMap = {
-    ...state.tokensMap,
-    ...payload
-  }),
-  SET_TOKEN_PROPS: (state, { address, value }: { address: string, value: Record<string, unknown>}) => {
-    const token = state.tokensMap[address]
-    const keys = Object.keys(value)
-    for (const key of keys) {
-      token[key] = value[key]
-    }
-    state.tokensMap = {
-      ...state.tokensMap,
-      [address]: token
-    }
+  SET_STAKER_DATA: (state, payload: string) => {
+    state.stakerData = payload;
   },
-  SET_TOKENS: (state, payload: string[]) => {
-    state.tokenAddresses = {
-      ...state.tokenAddresses,
-      ...payload
-    }
+  SET_CLAIMABLE_AMOUNT: (state, payload: string) => {
+    state.claimableAmount = payload;
+  },
+  SET_EVENTS: (state, payload: any[]) => {
+    state.events = payload;
+  },
+  SET_IS_MODAL: (state, payload: boolean) => {
+    state.isModal = payload;
   }
 }
 
