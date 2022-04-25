@@ -29,6 +29,7 @@ module.exports = {
     blockNumber: 'Номер блока',
     amount: 'Количество',
     time: 'Время',
+    date: 'Дата',
   },
   modal: {
     fee: 'Примерная коммиссия',

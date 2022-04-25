@@ -3,7 +3,7 @@ import { ITokenState } from '~/store/contract/state'
 import {fetchContractData, getFee, getUserAddress} from '~/utils/web3'
 import {STACKING_CONTRACT} from "~/utils/abis/stackingContract";
 import {ITokenGetter} from "~/store/token/getters";
-import {shiftedBy} from "~/utils";
+import {getDate, getTime, shiftedBy } from "~/utils";
 import {STACKING_ERC20} from "~/utils/abis/stacking";
 import Token from "~/classes/Token";
 import BasicContract from "~/classes/BasicContract/BasicContract";
@@ -78,7 +78,7 @@ const actions: ActionTree<ITokenState, ITokenState> = {
             event: el.event,
             blockNumber: el.blockNumber,
             amount: `${shiftedBy(el.returnValues.amount, '18')} ${symbol}`,
-            time: el.returnValues.time,
+            timestamp: el.returnValues.time
           }
       })
       console.log(prepared);

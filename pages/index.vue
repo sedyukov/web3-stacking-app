@@ -90,8 +90,9 @@ export default Vue.extend({
   max-height: 400px;
   height: 35%;
   overflow-y: scroll;
-  border: 1px solid black;
-  margin: 100px 200px 100px 200px;
+  width: max-content;
+  padding: 0 20px;
+  margin: 100px auto;
 }
 .default-button {
   background: black;

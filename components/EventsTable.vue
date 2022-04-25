@@ -1,7 +1,7 @@
 <template>
   <div class="table">
     <table>
-      <tr>
+      <tr class="table__header">
         <th v-for="header in headers" class="table__el">{{ header }}</th>
       </tr>
       <tr v-for="(save, i) in events" v-if="events.length">
@@ -14,6 +14,7 @@
 
 <script>
 import {mapGetters} from "vuex";
+import {getDate, getTime} from "~/utils";
 
 export default {
   name: "EventsTable",
@@ -23,7 +24,7 @@ export default {
   },
   computed: {
     ...mapGetters({
-      events: 'contract/getEvents',
+      eventsData: 'contract/getEvents',
       isConnected: 'wallet/getIsConnected',
     }),
     keys() {
@@ -31,6 +32,17 @@ export default {
     },
     headers() {
       return this.$t(`table`);
+    },
+    events() {
+      return this.eventsData.map(el => {
+        const formatted = {
+        ...el,
+          time: getTime(el.timestamp),
+          date: getDate(el.timestamp, this.$i18n.locale)
+        };
+        delete formatted.timestamp;
+        return formatted;
+      })
     }
   },
   watch: {
@@ -44,5 +56,11 @@ export default {
 <style scoped>
 .table__el {
   padding: 10px;
+}
+th {
+  background: white;
+  position: sticky;
+  top: 0;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.4);
 }
 </style>

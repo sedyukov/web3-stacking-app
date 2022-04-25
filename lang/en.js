@@ -29,6 +29,7 @@ module.exports = {
     blockNumber: 'Block number',
     amount: 'Amount',
     time: 'Time',
+    date: 'Date',
   },
   modal: {
     fee: 'Approximate fee',
