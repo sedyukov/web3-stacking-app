@@ -11,7 +11,7 @@
       </ValidationProvider>
     </div>
     <div class="token-form__el">
-      <ValidationProvider rules="required|strictPositive|maxVal" v-slot="v">
+      <ValidationProvider rules="required|strictPositive|maxApprove" v-slot="v">
         <label for="stakeAmount">STAKE:</label>
         <input :disabled="!isConnected" id="stakeAmount" v-model="stakeAmount" type="text">
         <button :class="{ 'btn-disabled': !isConnected || v.errors.length }" :disabled="!isConnected" class="default-button" @click="openModal('actionBtnStake')">
@@ -37,7 +37,7 @@
 <script>
 import {mapGetters} from "vuex";
 import BigNumber from "bignumber.js";
-import {getFee, getStakedAmount, getUserAddress} from "~/utils/web3";
+import {getBalance, getFee, getStakedAmount, getUserAddress} from "~/utils/web3";
 import {STACKING_CONTRACT} from "~/utils/abis/stackingContract";
 import {shiftedBy} from "~/utils";
 import {STACKING_ERC20} from "~/utils/abis/stacking";
@@ -66,7 +66,8 @@ export default {
       allowance: 'token/getAllowance',
       isConnected: 'wallet/getIsConnected',
       tokens: 'token/getTokens',
-      contractAddress: 'contract/getContractAddress'
+      contractAddress: 'contract/getContractAddress',
+      userData: 'token/getTokensMap',
     }),
   },
   mounted() {
@@ -133,7 +134,6 @@ export default {
       this.isModal = false;
       switch (action) {
         case 'mint':
-          console.log(1);
           this.mint();
           break;
         case 'actionBtnStake':
@@ -171,7 +171,6 @@ export default {
       this.isStacking = !(value.comparedTo(allowance) === 1);
       this.btnStakeText =  this.isStacking ? this.$t(`buttons.stake`) : this.$t(`buttons.approve`);
     },
-
   }
 }
 extend('strictPositive', value => {
@@ -189,7 +188,17 @@ extend('required', {
 });
 
 extend('maxUnstake', value => {
-  return value <= Number(getStakedAmount());
+  const bigValue = new BigNumber(value);
+  const bigStaked= new BigNumber(getStakedAmount())
+  const isBigger = bigValue.comparedTo(bigStaked) === 1;
+  return !isBigger;
+});
+
+extend('maxApprove', value => {
+  const bigValue = new BigNumber(value);
+  const bigBalance = new BigNumber(getBalance())
+  const isBigger = bigValue.comparedTo(bigBalance) === 1;
+  return !isBigger;
 });
 
 extend('maxVal', value => {

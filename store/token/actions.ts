@@ -67,7 +67,6 @@ const actions: ActionTree<ITokenState, ITokenState> = {
       const tokenAddress = getters.getTokens[0];
       const contractAddress = process.env.stackingContract || '';
       const bigAmount = shiftedBy(amount, `-18`);
-      console.log(bigAmount)
       // example get fee
       // let fee = await getFee('approve', STACKING_ERC20, tokenAddress, [getUserAddress(), bigAmount])
       // fee = shiftedBy(fee, '18', 1)

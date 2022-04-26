@@ -13,6 +13,8 @@ let web4: any
 let userAddress: string
 let chainId: number
 let stakedAmount: string
+let balance: string
+let isStake: boolean = true;
 
 BigNumber.config({ EXPONENTIAL_AT: 60 })
 
@@ -22,7 +24,13 @@ export const fetchContractData = async (method: string, abi: Array<any>, address
   try {
     const contract = new web3Guest.eth.Contract(abi, address)
     const res = await contract.methods[method].apply(this, params).call();
-    if (method === 'getStakerData') stakedAmount = shiftedBy(res[0], '18');
+    if (method === 'getStakerData') {
+      stakedAmount = shiftedBy(res[0], '18');
+    }
+    if (method === 'balanceOf' && process.env.stacking === address) {
+      balance= shiftedBy(res.toString(), '18');
+      isStake = false;
+    }
     return res;
   } catch (e) {
     console.log(e)
@@ -62,10 +70,10 @@ export const startPingingMetamask = (callback: any): IResponse => {
 export const connectNode = (): IResponse => {
   try {
     let bscUrl
-    if (process.env.IS_MAINNET === 'true') {
-      bscUrl = 'wss://mainnet.infura.io/ws/v3/4f9234a0518644ef9b62fb4d4ff53df2'
+    if (process.env.isMainNet === 'true') {
+      bscUrl = 'wss://mainnet.infura.io/ws/v3/' + process.env.infuraKey;
     } else {
-      bscUrl = 'wss://rinkeby.infura.io/ws/v3/4f9234a0518644ef9b62fb4d4ff53df2'
+      bscUrl = 'wss://rinkeby.infura.io/ws/v3/' + process.env.infuraKey;
     }
     const provider = new Web3.providers.WebsocketProvider(bscUrl)
     web3Guest = new Web3(provider)
@@ -141,3 +149,5 @@ export const getWeb3 = (): any => web3Wallet || web3Guest
 export const getUserAddress = (): string => userAddress
 
 export const getStakedAmount = (): string => stakedAmount
+
+export const getBalance = (): string => balance

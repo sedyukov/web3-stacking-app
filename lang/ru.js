@@ -37,6 +37,7 @@ module.exports = {
   },
   messages: {
     notValid: 'Не корректное значение',
-    required: 'Обязательное поле'
+    required: 'Обязательное поле',
+    net: 'Вы должны выбрать'
   }
 };

@@ -4,9 +4,12 @@
         <button
           class="default-button"
           @click="connectWallet"
+          :disabled="!validChain"
+          :class="{ 'btn-disabled': !validChain }"
         >
           {{ $t(`main.wallet`) }}
         </button>
+        <div v-if="!validChain" class="valid-chain">{{ $t(`messages.net`) }} {{ networkName }}</div>
       </div>
       <Loader v-if="isUpdating"/>
       <div v-if="!firstLoading">
@@ -29,7 +32,7 @@
     </div>
 </template>
 
-<script lang="ts">
+<script>
 import Vue from 'vue'
 import TokenView from "~/components/TokenView.vue";
 import TokenForm from "~/components/TokenForm.vue";
@@ -55,9 +58,12 @@ export default Vue.extend({
   data() {
     return {
       firstLoading: true,
+      networkName: '',
+      envChainId: '',
     }
   },
   async mounted () {
+    this.getNetworkEnv()
     await this.connectNode()
     this.$store.commit('wallet/SET_IS_UPDATING', false);
     this.firstLoading = false;
@@ -67,8 +73,12 @@ export default Vue.extend({
       tokensMap: 'token/getTokensMap',
       tokensKeys: 'token/getTokensKeys',
       isUpdating: 'wallet/getIsUpdating',
-      isModal: 'contract/getIsModal'
-    })
+      isModal: 'contract/getIsModal',
+      chainId: 'wallet/getChainId',
+    }),
+    validChain() {
+      return this.chainId === this.envChainId;
+    },
   },
   methods: {
     ...mapActions({
@@ -76,6 +86,11 @@ export default Vue.extend({
       connectWallet: 'wallet/connectWallet',
       approve: 'token/approve'
     }),
+    getNetworkEnv(){
+      const isMainNet = process.env.isMainNet === 'true';
+      this.networkName = isMainNet ? 'Mainnet' : 'Rinkeby';
+      this.envChainId = isMainNet ? '0x1' : '0x4';
+    }
   },
 })
 </script>

@@ -6,7 +6,8 @@ const mutations: MutationTree<IWalletState> = {
   SET_IS_UPDATING: (state, payload: boolean) => (state.isUpdating = payload),
   SET_MESSAGES: (state, payload: string) =>  {
     state.messages.push(payload);
-  }
+  },
+  SET_CHAIN_ID: (state, payload: string) => (state.chainId = payload),
 }
 
 export default mutations

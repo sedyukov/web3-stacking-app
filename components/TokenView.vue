@@ -25,6 +25,7 @@ export default Vue.extend({
     }
   },
   async mounted() {
+    await this.getMessages()
   },
   computed: {
     ...mapGetters({
@@ -43,19 +44,25 @@ export default Vue.extend({
     },
   },
   watch: {
-    isConnected(val) {
+    async isConnected(val) {
       if (val) {
-        this.$store.dispatch('token/getAllowance');
+        await Promise.all([
+          this.$store.dispatch('token/getAllowance'),
+        ])
+        // await this.$store.dispatch('token/getAllowance');
+        // await this.getMessages();
       }
     },
-    messages() {
-      console.log('CHANGED');
-    }
   },
   methods: {
     async getMessages() {
       const r = await getEthereum();
-      r.on('message', () => {
+      this.$store.commit('wallet/SET_CHAIN_ID', r.chainId)
+      r.on('chainChanged', () => {
+        this.$router.go();
+      })
+      r.on('accountsChanged', () => {
+        this.$router.go();
       })
     },
   }

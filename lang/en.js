@@ -37,6 +37,7 @@ module.exports = {
   },
   messages: {
     notValid: 'Not valid value',
-    required: 'Required value'
+    required: 'Required value',
+    net: 'You should choose'
   }
 };

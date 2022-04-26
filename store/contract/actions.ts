@@ -12,9 +12,7 @@ const actions: ActionTree<ITokenState, ITokenState> = {
   async getStakerData ({ commit, getters }) {
     try {
       let data = await fetchContractData('getStakerData', STACKING_CONTRACT, getters.getContractAddress, [getUserAddress()]);
-      console.log(data);
       let staked = shiftedBy(data[0], '18', 1);
-      console.log(staked);
       commit('SET_STAKER_DATA', staked);
     } catch (e) {
       console.log(e)
@@ -23,7 +21,6 @@ const actions: ActionTree<ITokenState, ITokenState> = {
   async getClaimableAmount ({ commit, getters }) {
     try {
       let data = await fetchContractData('getClaimableAmount', STACKING_CONTRACT, getters.getContractAddress, [getUserAddress()]);
-      console.log(data);
       data = shiftedBy(data, '18', 1);
       commit('SET_CLAIMABLE_AMOUNT', data);
 
@@ -34,11 +31,9 @@ const actions: ActionTree<ITokenState, ITokenState> = {
   async stake ({ getters }, amount: string) {
     try {
       const bigAmount = shiftedBy(amount, `-18`);
-      console.log(bigAmount)
       // example get fee
       let fee = await getFee('stake', STACKING_CONTRACT, getters.getContractAddress, [bigAmount])
       fee = shiftedBy(fee, '18', 1)
-      console.log(fee)
       await BasicContract.stake(getters.getContractAddress, STACKING_CONTRACT, bigAmount)
     } catch (e) {
       console.log(e)
@@ -47,11 +42,9 @@ const actions: ActionTree<ITokenState, ITokenState> = {
   async unstake ({ getters }, amount: string) {
     try {
       const bigAmount = shiftedBy(amount, `-18`);
-      console.log(bigAmount)
       // example get fee
       let fee = await getFee('unstake', STACKING_CONTRACT, getters.getContractAddress, [bigAmount])
       fee = shiftedBy(fee, '18', 1)
-      console.log(fee)
       await BasicContract.unstake(getters.getContractAddress, STACKING_CONTRACT, bigAmount)
     } catch (e) {
       console.log(e)
@@ -68,7 +61,6 @@ const actions: ActionTree<ITokenState, ITokenState> = {
     try {
       const data = await BasicContract.pastEvents(getters.getContractAddress, STACKING_CONTRACT, getUserAddress())
       const eventNames = ['Staked', 'Unstaked', 'Claimed']
-      console.log(data.result)
       const prepared = data.result.filter((el: any) => {
         return eventNames.includes(el.event)  && el.returnValues.sender.toLowerCase() === getUserAddress().toLowerCase()
       })
@@ -81,7 +73,6 @@ const actions: ActionTree<ITokenState, ITokenState> = {
             timestamp: el.returnValues.time
           }
       })
-      console.log(prepared);
       commit('SET_EVENTS', prepared)
     } catch (e) {
       console.log(e)

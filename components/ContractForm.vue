@@ -47,7 +47,6 @@ export default {
     async openModal() {
       const fee = await getFee('claim', STACKING_CONTRACT, this.address)
       this.fee = shiftedBy(fee, '18');
-      console.log(this.fee);
       this.isModal = true;
     },
     decline() {

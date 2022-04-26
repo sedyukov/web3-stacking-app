@@ -17,7 +17,6 @@ const actions: ActionTree<IWalletState, IWalletState> = {
     const r = await connectWallet()
     if (!r.ok) {
       commit('SET_IS_CONNECTED', false);
-      console.log(r)
       return r
     }
     await dispatch('token/fetchUserDataToken', null, { root: true })
