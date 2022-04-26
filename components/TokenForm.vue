@@ -1,25 +1,34 @@
 <template>
   <div class="token-form">
     <div class="token-form__el">
-      <label for="mintAmount">MINT:</label>
-      <input :disabled="!isConnected" id="mintAmount" v-model="mintAmount" type="text">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="openModal('mint')">
-        {{ $t(`buttons.mint`).toUpperCase() }}
-      </button>
+      <ValidationProvider rules="required|strictPositive|maxVal" v-slot="v">
+        <label for="mintAmount">MINT:</label>
+        <input :disabled="!isConnected" id="mintAmount" v-model="mintAmount" type="text">
+        <button :class="{ 'btn-disabled': !isConnected || v.errors.length }" :disabled="!isConnected" class="default-button" @click="openModal('mint')">
+          {{ $t(`buttons.mint`).toUpperCase() }}
+        </button>
+        <div v-if="v.errors.length">{{ $t('messages.notValid') }}</div>
+      </ValidationProvider>
     </div>
     <div class="token-form__el">
-      <label for="stakeAmount">STAKE:</label>
-      <input :disabled="!isConnected" id="stakeAmount" v-model="stakeAmount" type="text">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="openModal('actionBtnStake')">
-        {{ btnStakeText.toUpperCase() }}
-      </button>
+      <ValidationProvider rules="required|strictPositive|maxVal" v-slot="v">
+        <label for="stakeAmount">STAKE:</label>
+        <input :disabled="!isConnected" id="stakeAmount" v-model="stakeAmount" type="text">
+        <button :class="{ 'btn-disabled': !isConnected || v.errors.length }" :disabled="!isConnected" class="default-button" @click="openModal('actionBtnStake')">
+          {{ btnStakeText.toUpperCase() }}
+        </button>
+        <div v-if="v.errors.length">{{ $t('messages.notValid') }}</div>
+      </ValidationProvider>
     </div>
     <div class="token-form__el">
-      <label for="unstakeAmount">UNSTAKE:</label>
-      <input :disabled="!isConnected" id="unstakeAmount" v-model="unstakeAmount" type="text">
-      <button :class="{ 'btn-disabled': !isConnected }" :disabled="!isConnected" class="default-button" @click="openModal('unstake')">
-        {{ $t(`buttons.unstake`).toUpperCase() }}
-      </button>
+      <ValidationProvider rules="required|strictPositive|maxUnstake" v-slot="v">
+        <label for="unstakeAmount">UNSTAKE:</label>
+        <input :disabled="!isConnected" id="unstakeAmount" v-model="unstakeAmount" type="text">
+        <button :class="{ 'btn-disabled': !isConnected || v.errors.length }" :disabled="!isConnected" class="default-button" @click="openModal('unstake')">
+          {{ $t(`buttons.unstake`).toUpperCase() }}
+        </button>
+        <div v-if="v.errors.length">{{ $t('messages.notValid') }}</div>
+      </ValidationProvider>
     </div>
     <ModalFee v-if="isModal" :fee="fee" @confirm="confirm" @decline="decline"/>
   </div>
@@ -28,20 +37,24 @@
 <script>
 import {mapGetters} from "vuex";
 import BigNumber from "bignumber.js";
-import {getFee, getUserAddress} from "~/utils/web3";
+import {getFee, getStakedAmount, getUserAddress} from "~/utils/web3";
 import {STACKING_CONTRACT} from "~/utils/abis/stackingContract";
 import {shiftedBy} from "~/utils";
 import {STACKING_ERC20} from "~/utils/abis/stacking";
+import {extend, ValidationProvider} from "vee-validate";
 
 export default {
   name: "TokenForm",
+  components: {
+    ValidationProvider,
+  },
   data() {
     return {
-      mintAmount: '0',
-      stakeAmount: '0',
-      unstakeAmount: '0',
+      mintAmount: '1',
+      stakeAmount: '1',
+      unstakeAmount: '1',
       btnStakeText: 'stake',
-      isStacking: false,
+      isStacking: true,
       isUpdated: true,
       isModal: false,
       currentAction: '',
@@ -62,7 +75,7 @@ export default {
     mint() {
       this.startLoading();
       this.$store.dispatch('token/mintStaking', this.mintAmount).then(() => this.update());
-      this.mintAmount = '0';
+      this.mintAmount = '1';
     },
     actionBtnStake() {
       this.startLoading();
@@ -74,16 +87,16 @@ export default {
     },
     stake() {
       this.$store.dispatch('contract/stake', this.stakeAmount).then(() => this.update());
-      this.stakeAmount = '0';
+      this.stakeAmount = '1';
     },
     approve() {
       this.$store.dispatch('token/approve', this.stakeAmount).then(() => this.update());
-      this.stakeAmount = '0';
+      this.stakeAmount = '1';
     },
     unstake() {
       this.startLoading();
       this.$store.dispatch('contract/unstake', this.unstakeAmount).then(() => this.update());
-      this.unstakeAmount = '0';
+      this.unstakeAmount = '1';
     },
     async openModal(action) {
       await this.calcFee(action);
@@ -161,6 +174,28 @@ export default {
 
   }
 }
+extend('strictPositive', value => {
+  return value > 0
+});
+
+extend('required', {
+  validate(value) {
+    return {
+      required: true,
+      valid: ['', null, undefined].indexOf(value) === -1
+    };
+  },
+  computesRequired: true,
+});
+
+extend('maxUnstake', value => {
+  return value <= Number(getStakedAmount());
+});
+
+extend('maxVal', value => {
+  return value <= Math.pow(10,18);
+});
+
 </script>
 
 <style scoped lang="scss">

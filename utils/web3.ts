@@ -2,7 +2,7 @@ import Web3 from 'web3'
 // @ts-ignore
 import Web4 from '@cryptonteam/web4'
 import BigNumber from 'bignumber.js'
-import { output, error, IResponse } from '~/utils/index'
+import {output, error, IResponse, shiftedBy} from '~/utils/index'
 import { STACKING_ERC20 } from '~/utils/abis/stacking'
 
 const { IS_MAINNET } = process.env
@@ -12,6 +12,7 @@ let web3Guest: any
 let web4: any
 let userAddress: string
 let chainId: number
+let stakedAmount: string
 
 BigNumber.config({ EXPONENTIAL_AT: 60 })
 
@@ -19,13 +20,10 @@ let pingTimer: any
 
 export const fetchContractData = async (method: string, abi: Array<any>, address: string, params?: Array<any>): Promise<any> => {
   try {
-    // console.log(address);
-    // console.log(abi);
     const contract = new web3Guest.eth.Contract(abi, address)
-    // console.log(contract)
-    // console.log(method)
-    // console.log(params)
-    return await contract.methods[method].apply(this, params).call()
+    const res = await contract.methods[method].apply(this, params).call();
+    if (method === 'getStakerData') stakedAmount = shiftedBy(res[0], '18');
+    return res;
   } catch (e) {
     console.log(e)
     return ''
@@ -141,3 +139,5 @@ export const getEthereum = async (): Promise<any> => {
 export const getWeb3 = (): any => web3Wallet || web3Guest
 
 export const getUserAddress = (): string => userAddress
+
+export const getStakedAmount = (): string => stakedAmount

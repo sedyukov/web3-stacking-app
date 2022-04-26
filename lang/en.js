@@ -34,5 +34,9 @@ module.exports = {
   modal: {
     fee: 'Approximate fee',
     continue: 'Continue?',
+  },
+  messages: {
+    notValid: 'Not valid value',
+    required: 'Required value'
   }
 };

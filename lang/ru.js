@@ -34,5 +34,9 @@ module.exports = {
   modal: {
     fee: 'Примерная коммиссия',
     continue: 'Продолжить?',
+  },
+  messages: {
+    notValid: 'Не корректное значение',
+    required: 'Обязательное поле'
   }
 };
